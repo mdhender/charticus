@@ -16,13 +16,9 @@
 
 package charticus
 
-const MAXSWITCHES = 256
-const objMax = 256
-
 type AS_BOOL = bool
 type BOOL = bool
 type Bitmap struct{}
-type CI struct{}
 type CIRC struct{}
 type CN struct{}
 type CSEC struct{}
@@ -42,7 +38,6 @@ type LPARAM struct{}
 type LRESULT struct{}
 type ObjDraw struct{}
 type PAR struct{}
-type PT3R struct{}
 type REAL8 struct{}
 type StrLook struct{}
 type TELE struct{}
