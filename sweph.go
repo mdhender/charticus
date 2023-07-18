@@ -17,6 +17,12 @@
 package charticus
 
 // sweph.cpp
+
+/****************
+ * global stuff *
+ ****************/
+var swed swe_data
+
 func aberr_light(xx *double, xe *double) { panic("!implemented") }
 
 func app_pos_etc_mean(ipl int, iflag int32, serr []byte) int { panic("!implemented") }

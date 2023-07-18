@@ -55,16 +55,12 @@ type WPARAM struct{}
 type centisec struct{}
 type double = float64
 type dword = int
-type epsilon struct{}
-type fixed_star struct{}
 type flag int
 type houses struct{}
 type kor struct{}
 type long = int
 type message struct{}
-type nut struct{}
 type pbyte = *byte
-type plan_data struct{}
 type real = float64
 type short = int
 type size_t = int
