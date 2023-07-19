@@ -165,6 +165,18 @@ const (
 	ddMax     _decandivisiontype = 10
 )
 
+// File types
+
+type _filetype int
+
+const (
+	ftNone _filetype = 0 // Not creating a file
+	ftBmp  _filetype = 1 // Windows bitmap file (.bmp)
+	ftPS   _filetype = 2 // PostScript file (.ps)
+	ftWmf  _filetype = 3 // Windows metafile file (.wmf)
+	ftWire _filetype = 4 // Daedalus wireframe file (.dw)
+)
+
 // House system models
 
 type _housemodel int
@@ -347,6 +359,12 @@ const (
 	ilistMax = 200
 )
 
+type _ArabicInfo struct {
+	form []byte // The formula to calculate it.
+	name []byte // The name of the Arabic part.
+}
+type AI = _ArabicInfo
+
 type _AtlasEntry struct {
 	lon    float64        // Longitude of city
 	lat    float64        // Latitude of city
@@ -356,6 +374,15 @@ type _AtlasEntry struct {
 	izn    int            // Time zone area of city
 }
 type AtlasEntry = _AtlasEntry
+
+// Bitmap
+type _Bitmap struct {
+	x     int    // Horizontal pixel size of bitmap
+	y     int    // Vertical pixel size of bitmap
+	clRow int    // Longs per row in bitmap
+	rgb   []byte // Bytes of bitmap bits
+}
+type Bitmap = _Bitmap
 
 type _ChartInfo struct {
 	mon int     // Month
@@ -386,6 +413,185 @@ type _ChartPositions struct {
 }
 type CP = _ChartPositions
 
+type _ElementTable struct {
+	coSum      int        // Total objects considered.
+	coHemi     int        // Number that can be in hemispheres.
+	coSign     [cSign]int // Number of objects in each sign.
+	coHouse    [cSign]int // Number of objects in each house.
+	coElemMode [4][3]int  // Objects in each elem/mode combo.
+	coElem     [4]int     // Objects in each element.
+	coMode     [3]int     // Objects in each sign mode.
+	coModeH    [3]int     // Objects in each house mode.
+	coYang     int        // Objects in Fire/Air signs.
+	coYin      int        // Objects in Earth/Water signs.
+	coLearn    int        // Objects in first six signs.
+	coShare    int        // Objects in last six signs.
+	coAsc      int        // Objects in Eastern houses.
+	coDes      int        // Objects in Western houses.
+	coMC       int        // Objects in Southern houses.
+	coIC       int        // Objects in Northern houses.
+}
+type ET = _ElementTable
+
+// Graphics
+type _GraphicsInternal struct {
+	nMode        int     // Current type of chart to create.
+	fMono        bool    // Is this a monochrome display.
+	kiCur        int     // Current color drawing with.
+	bm           pbyte   // Pointer to allocated memory.
+	cbBmpRow     int     // Horizontal size of bitmap array in memory.
+	szFileOut    []byte  // Current name of bitmap file (-Xo).
+	file         *FILE   // Actual file handle writing graphics to.
+	rAsc         float64 // Degree to be at left edge in wheel charts.
+	fFile        bool    // Are we making a graphics file.
+	fDidSphere   bool    // Has a chart sphere been drawn once yet?
+	zViewRatio   float64 // Offset to adjust chart view (based on zoom).
+	nScale       int     // Scale ratio, e.g. percentage / 100.
+	nScaleText   int     // Text scale ratio, i.e. percentage / 50.
+	nScaleT      int     // Internal units per pixel (1 for screen).
+	nScaleTextT  int     // Internal text scale, i.e. nScaleText * nScaleT.
+	nScaleTextT2 int     // Twice internal text scale, i.e. nScaleTextT * 2.
+	nGridCell    int     // Actual number of cells in -g grids.
+	nPenWid      int     // Pen width to use when creating metafiles.
+	nFontPrev    int     // System fonts to restore when turning fonts on.
+	kiOn         KI      // Foreground color.
+	kiOff        KI      // Background color.
+	kiLite       KI      // Hilight color.
+	kiGray       KI      // A "dim" color.
+	xOffset      int     // Viewport origin.
+	yOffset      int
+	xTurtle      int // Current coordinates of drawing pen.
+	yTurtle      int
+	xPen         int // Cached coordinates where last line ended.
+	yPen         int
+	rgspace      *PT3R  // List of orbit trail coordinates (-S -X).
+	ispace       int    // Index of most recent coordinate (-S -X).
+	cspace       int    // Coordinates within table so far (-S -X).
+	rgzCalendar  *int   // Aspect coordinates in calendar (-K -X).
+	fBmp         bool   // Are 24 bit bitmaps being used? (-Xbw set).
+	bmp          Bitmap // Bitmap storing chart contents, sized appropriately.
+	bmpBack      Bitmap // Bitmap storing background, as loaded from file.
+	bmpBack2     Bitmap // Bitmap storing background, at current transparency.
+	bmpWorld     Bitmap // Bitmap storing world map, as loaded from file.
+	bmpRising    Bitmap // Bitmap storing rising chart, as drawn within it.
+
+	rges      *ES // List of extra star coordinates (-YXU).
+	cStarsLin int // Count of extra star coordinates (-YXU).
+
+	// Variables used by the PostScript generator.
+	fEps     bool    // Are we doing Encapsulated PostScript.
+	cStroke  int     // Number of items drawn without flushing.
+	fLineCap bool    // Are line ends rounded instead of square.
+	nDash    int     // How much long are dashes in lines drawn.
+	nFontPS  int     // What system font are we drawing text in.
+	rLineWid float64 // How wide are lines, et al, drawn with.
+
+	// Variables used by the metafile generator.
+	pwMetaCur *int // Current mem position when making metafile.
+	cbMeta    int  // Maximum size allowed for metafile.
+	pwPoly    *int // Position for start of current polyline.
+	kiPoly    KI   // Line color for current polyline.
+	kiLineAct KI   // Desired and actual line color.
+	kiLineDes KI
+	kiFillAct KI // Desired and actual fill color.
+	kiFillDes KI
+	nFontAct  int // Desired and actual text font.
+	nFontDes  int
+	kiTextAct KI // Desired and actual text color.
+	kiTextDes KI
+	nAlignAct int // Desired/actual text alignment.
+	nAlignDes int
+
+	// Variables used by the wireframe generator.
+	pwWireCur *int // Current memory position when doing wireframe.
+	cbWire    int
+	cWire     int // Number of lines in wireframe file.
+	kiInFile  KI  // Actual line color currently in file.
+	zDefault  int // Default elevation for 2D drawing.
+}
+type GI = _GraphicsInternal
+
+type _GraphicsSettings struct {
+	ft           _filetype // File type being created (-Xb, -Xp, -XM, or -X3).
+	fPSComplete  bool      // Is PostScript file not encapsulated (-Xp0 set).
+	fColor       bool      // Are we drawing a color chart (-Xm not set).
+	fInverse     bool      // Are we drawing in reverse video (-Xr set).
+	fRoot        bool      // Are we drawing on the X11 background (-XB set).
+	fText        bool      // Are we printing chart info on chart (-Xt set).
+	nFontAll     int       // Which fonts to use for sign/house/obj/asp (-YXf).
+	nFontTxt     int       // Which font to use for graphics text       (-YXft).
+	nFontSig     int       // Which font to use for signs of the zodiac (-YXfs).
+	nFontHou     int       // Which font to use for labelling houses    (-YXfh).
+	nFontObj     int       // Which font to use for planets and objects (-YXfo).
+	nFontAsp     int       // Which font to use for aspects             (-YXfa).
+	nFontNak     int       // Which font to use for Vedic Nakshatras    (-YXfn).
+	fAlt         bool      // Are we drawing in alternate mode (-Xi set).
+	fBorder      bool      // Are we drawing borders around charts (-Xu set).
+	fLabel       bool      // Are we labeling objects in charts (-Xl not set).
+	fLabelAsp    bool      // Are we drawing aspect glyphs on lines (-XA set).
+	fLabelCity   bool      // Are we plotting cities on maps (-XL set).
+	fJetTrail    bool      // Are we not clearing screen on updates (-Xj set).
+	fConstel     bool      // Are we drawing maps as constellations (-XF set).
+	fSouth       bool      // Are we focus on south hemisphere (-XX0/XP0 set).
+	fMollewide   bool      // Are we drawing maps scaled correctly (-XW0 set).
+	fEquator     bool      // Are we showing equator on maps/globes (-Xe set).
+	fEcliptic    bool      // Are we drawing oriented to ecliptic (-YXe set).
+	fAllStar     bool      // Are we drawing all sefstars.txt stars (-XU set).
+	fHouseExtra  bool      // Are we showing additional house info (-XC set).
+	fPrintMap    bool      // Are we printing globe names on draw (-XPv set).
+	fKeepSquare  bool      // Are we preserving chart aspect ratio (-XQ set).
+	fAnimMap     bool      // Are we animating map instead of time (-XN set).
+	fThick       bool      // Are we drawing thicker lines in charts (-Xx set).
+	fIndianWheel bool      // Are wheel charts North/South Indian (-XJ set).
+	fMoonWheel   bool      // Are moons drawn around planets in wheels (-X8 set).
+	xWin         int       // Current hor. size of graphic chart (-Xw).
+	yWin         int       // Current ver. size of graphic chart (-Xw).
+	nAnim        int       // Current animation mode jump rate (-Xn).
+	nScale       int       // Current character scale factor (-Xs).
+	nScaleText   int       // Current graphics text scale factor (-XS).
+	nAllStar     int       // Extra star size and labelling (-XU).
+	nAstLo       int       // Extra asteroid min ephemeris file (-XE).
+	nAstHi       int       // Extra asteroid max ephemeris file (-XE).
+	nAstLabel    int       // How extra asteroids get labeled (-XE).
+	nLabelCity   int       // How city plottings get colored (-XL).
+	objLeft      int       // Current object to place on Asc (-X1).
+	rRot         float64   // Current rotation degree of globe (-XG).
+	rTilt        float64   // Current vertical tilt of rotating globe (-XG).
+	objTrack     int       // Object being telescope tracked, if any (-XZ).
+	chBmpMode    byte      // Current bitmap file type (-Xb).
+	rBackPct     float64   // Background image transparency percentage (-XI).
+	nBackOrient  int       // Background image wallpaper orientation (-XI).
+	nOrient      int       // PostScript paper orientation indicator.
+	xInch        real      // PostScript horizontal paper size inches.
+	yInch        real      // PostScript vertical paper size inches.
+	szDisplay    []byte    // Current X11 display name (-Xd).
+	nDecaType    int       // Type of wheel chart decoration (-YXv).
+	nDecaSize    int       // Size of wheel chart decoration (-YXv).
+	nDecaLine    int       // Lines in wheel chart decoration (-YXv).
+	nDecaFill    int       // Fill method for wheel chart sections (-Xv).
+	szSidebar    []byte    // Extra text to append to bottom of sidebar (-YXt)
+	nGridCell    int       // Number of cells in -g grids (-YXg).
+	rspace       float64   // Radius in AU of -S orbit chart (-YXS).
+	cspace       int       // Number of -S orbit trails allowed (-YXj).
+	zspace       int       // Height diff of each orbit trail (-YXj0).
+	nRayWidth    int       // Column width in -7 esoteric chart (-YX7).
+	nGlyphCap    int       // Glyph to use for sign Capricorn (-YXGc).
+	nGlyphUra    int       // Glyph to use for planet Uranus (-YXGu).
+	nGlyphPlu    int       // Glyph to use for planet Pluto (-YXGp).
+	nGlyphLil    int       // Glyph to use for object Lilith (-YXGl).
+	nGlyphVer    int       // Glyph to use for object Vertex (-YXGv).
+	nGlyphEri    int       // Glyph to use for planet Eris (-YXGe).
+	fColorSign   bool      // More color for sign boundaries. (-YXk).
+	fColorHouse  bool      // More color for house boundaries. (-YXk0).
+	fAltPalette  bool      // Use alternate palette for white backgrounds (-YXK0).
+	nDashMax     int       // Maximum dash allowed for lines (-YXA).
+	nTriangles   int       // Triangles/cubes grid to draw on maps, if any (-YXW).
+	szStarsLin   []byte    // Names of extra stars for linking (-YXU).
+	szStarsLnk   []byte    // Indexes of star pairs to link up (-YXU).
+}
+type GS = _GraphicsSettings
+
+// Internal Settings
 // TODO: should nObj be _object instead of int?
 type _InternalSettings struct {
 	fHaveInfo     flag        // Do we need to prompt user for chart info?
@@ -789,7 +995,27 @@ const (
 	// Greater numbers means more accuracy but slower calculation, of exact
 	// aspect and transit times.
 	DIVISIONS = 48
+
+	// BITMAPMODE determines how how bitmaps are written:
+	//   'N' is written like with the 'bitmap' program
+	//   'C' is compacted somewhat (files have less spaces)
+	//   'V' is compacted even more
+	//   'A' means write as rectangular Ascii text file
+	//   'B' means write as Windows bitmap (.bmp) file
+	BITMAPMODE = 'C'
 )
+
+// By the time you reach here and the above values are customized as desired, Charticus is ready to be compiled!
+// Be sure to similarly change the values in the charticus.json file, which will override any corresponding compile time values here.
+// Don't change any of the values in the section below unless you know what you're doing.
+
+const (
+	// Default window size.
+	DEFAULTX = 600
+	DEFAULTY = 600
+)
+
+// mostly functions translated from macros
 
 func DFromR(x float64) float64 {
 	return x * rDegRad

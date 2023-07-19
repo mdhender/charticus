@@ -18,13 +18,11 @@ package charticus
 
 type AS_BOOL = bool
 type BOOL = bool
-type Bitmap struct{}
 type CIRC struct{}
 type CN struct{}
 type CSEC struct{}
 type ENUMLOGFONTEX struct{}
 type ES struct{}
-type ET struct{}
 type FILE struct{}
 type HDC struct{}
 type HINSTANCE struct{}
